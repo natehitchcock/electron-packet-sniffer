@@ -7,14 +7,14 @@ const BrowserWindow = electron.BrowserWindow;
 const path = require('path');
 const url = require('url');
 
+const dgram = require('dgram');
+const server = dgram.createSocket('udp4');
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 
 function createWindow() {
-
-    const dgram = require('dgram');
-    const server = dgram.createSocket('udp4');
 
     server.on('error', (err) => {
     console.log(`server error:\n${err.stack}`);
@@ -30,7 +30,13 @@ function createWindow() {
     console.log(`server listening ${address.address}:${address.port}`);
     });
 
-    server.bind(80);
+    server.bind({
+        port: 443,
+        address: 'localhost',
+        exclusive: false
+    });
+
+    server.send("hello socket!", 443);
 
     // Create the browser window.
     mainWindow = new BrowserWindow({width: 800, height: 600});
